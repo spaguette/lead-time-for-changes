@@ -69,11 +69,13 @@ function Main ([string] $ownerRepo,
 
     $prCounter = 0
     $totalPRHours = 0
+    $rejectedPrCounter = 0
     # Filter the $prsResponse array based on $rejectLabelsArray
     $filteredPrResponses = $prsResponse | Where-Object {
         $prLabels = $_.labels.name
         foreach ($rejectLabel in $rejectLabelsArray) {
             if ($prLabels -contains $rejectLabel) {
+                $rejectedPrCounter++
                 return $false  # Exclude if any rejected label is found
             }
         }
@@ -218,6 +220,7 @@ function Main ([string] $ownerRepo,
     Write-Host "Workflow average time duration $($totalAverageworkflowHours)"
     $leadTimeForChangesInHours = ($totalPRHours / $prCounter) + ($totalAverageworkflowHours)
     Write-Host "Lead time for changes in hours: $leadTimeForChangesInHours"
+    Write-Host "Number of PRs rejected by labels: $rejectedPrCounter"
 
     #==========================================
     #Show current rate limit
@@ -292,7 +295,7 @@ function Main ([string] $ownerRepo,
     if ($leadTimeForChangesInHours -gt 0 -and $numberOfDays -gt 0)
     {
         Write-Host "Lead time for changes average over last $numberOfDays days, is $displayMetric $displayUnit, with a DORA rating of '$rating'"
-        return GetFormattedMarkdown -workflowNames $workflowNames -displayMetric $displayMetric -displayUnit $displayUnit -repo $ownerRepo -branch $branch -numberOfDays $numberOfDays -color $color -rating $rating
+        return GetFormattedMarkdown -workflowNames $workflowNames -displayMetric $displayMetric -displayUnit $displayUnit -repo $ownerRepo -branch $branch -numberOfDays $numberOfDays -color $color -rating $rating -rejectedPrCounter $rejectedPrCounter
     }
     else
     {
@@ -400,7 +403,7 @@ function Get-JwtToken([string] $appId, [string] $appInstallationId, [string] $ap
 }
 
 # Format output for deployment frequency in markdown
-function GetFormattedMarkdown([array] $workflowNames, [string] $rating, [string] $displayMetric, [string] $displayUnit, [string] $repo, [string] $branch, [string] $numberOfDays, [string] $numberOfUniqueDates, [string] $color)
+function GetFormattedMarkdown([array] $workflowNames, [string] $rating, [string] $displayMetric, [string] $displayUnit, [string] $repo, [string] $branch, [string] $numberOfDays, [string] $numberOfUniqueDates, [string] $color, [string] $rejectedPrCounter)
 {
     $encodedString = [uri]::EscapeUriString($displayMetric + " " + $displayUnit)
     #double newline to start the line helps with formatting in GitHub logs
@@ -410,6 +413,7 @@ function GetFormattedMarkdown([array] $workflowNames, [string] $rating, [string]
         "**Details**:`n" + 
         "- Repository: $repo using $branch branch`n" + 
         "- Workflow(s) used: $($workflowNames -join ", ")`n" +
+        "- Number of PRs rejected by labels: $rejectedPrCounter`n" +
         "---"
     return $markdown
 }
