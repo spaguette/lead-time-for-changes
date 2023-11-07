@@ -52,7 +52,7 @@ function Main ([string] $ownerRepo,
 
     #Get pull requests from the repo 
     #https://developer.GitHub.com/v3/pulls/#list-pull-requests
-    $uri = "https://api.github.com/repos/$owner/$repo/pulls?state=all&head=$branch&per_page=100&state=closed";
+    $uri = "https://api.github.com/repos/$owner/$repo/pulls?base=$branch&per_page=100&state=closed";
     if (!$authHeader)
     {
         #No authentication
