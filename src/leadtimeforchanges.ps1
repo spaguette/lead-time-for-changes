@@ -72,11 +72,11 @@ function Main ([string] $ownerRepo,
     $rejectedPrCounter = 0
     # Filter the $prsResponse array based on $rejectLabelsArray
     $filteredPrResponses = $prsResponse | Where-Object {
-        $prLabels = $_.labels.name
-        foreach ($rejectLabel in $rejectLabelsArray) {
-            if ($prLabels -contains $rejectLabel) {
+        Foreach ($label in $_.labels) {
+            $labelName = $label.name
+            if ($rejectLabelsArray -contains $labelName) {
                 $rejectedPrCounter++
-                return $false  # Exclude if any rejected label is found
+                return $false  # If any rejected label is found, exclude the item
             }
         }
         return $true  # Include if none of the rejected labels are found
