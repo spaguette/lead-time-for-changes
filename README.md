@@ -22,6 +22,7 @@ A GitHub Action to roughly calculate DORA lead time for changes This is not mean
 - `default-branch`: optional, string, defaults to `main` 
 - `number-of-days`: optional, integer, defaults to `30` (days)
 - `reject-labels`: optional. Multiple label names to reject can be separated by `,`
+- `filter-labels`: optional. Multiple label names to filter can be separated by `,`
 - `commit-counting-method`: #optional, defaults to 'last'. Accepts two values, 'last' - to start timing from the last commit of a PR, and 'first' to start timing from the first commit of a PR
 - `pat-token`: optional, string, defaults to ''. Can be set with GitHub PAT token. Ensure that `Read access to actions and metadata` permission is set. This is a secret, never directly add this into the actions workflow, use a secret.
 - `actions-token`: optional, string, defaults to ''. Can be set with `${{ secrets.GITHUB_TOKEN }}` in the action

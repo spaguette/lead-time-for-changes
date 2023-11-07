@@ -6,6 +6,7 @@ Param(
     [Int32] $numberOfDays,
     [string] $commitCountingMethod = "last",
     [string] $rejectLabels = "",
+    [string] $filterLabels = "",
     [string] $patToken = "",
     [string] $actionsToken = "",
     [string] $appId = "",
@@ -20,6 +21,7 @@ function Main ([string] $ownerRepo,
     [Int32] $numberOfDays,
     [string] $commitCountingMethod,
     [string] $rejectLabels = "",
+    [string] $filterLabels = "",
     [string] $patToken = "",
     [string] $actionsToken = "",
     [string] $appId = "",
@@ -35,6 +37,7 @@ function Main ([string] $ownerRepo,
     $workflowsArray = $workflows -split ','
     $numberOfDays = $numberOfDays        
     $rejectLabelsArray = $rejectLabels -split ','
+    $filterLabelsArray = $filterLabels -split ','
     if ($commitCountingMethod -eq "")
     {
         $commitCountingMethod = "last"
@@ -72,7 +75,7 @@ function Main ([string] $ownerRepo,
     $totalPRHours = 0
     $rejectedPrCounter = 0
     # Filter the $prsResponse array based on $rejectLabelsArray
-    $filteredPrResponses = $prsResponse | Where-Object {
+    $prResponsesWithoutRejected = $prsResponse | Where-Object {
         Foreach ($label in $_.labels) {
             $labelName = $label.name
             if ($rejectLabelsArray -contains $labelName) {
@@ -82,6 +85,21 @@ function Main ([string] $ownerRepo,
         }
         return $true  # Include if none of the rejected labels are found
     }
+
+    $filteredPrResponses = $prResponsesWithoutRejected
+    if ($filterLabels -ne "") {
+        # Filter the $prsResponse array based on $rejectLabelsArray
+        $filteredPrResponses = $prResponsesWithoutRejected | Where-Object {
+            Foreach ($label in $_.labels) {
+                $labelName = $label.name
+                if ($filterLabelsArray -contains $labelName) {
+                    return $true  # If any filtered label is found, include the item
+                }
+            }
+            return $false  # Don't include the item if the filtered label is not found
+        }
+    }
+
     Foreach ($pr in $filteredPrResponses){
 
         $mergedAt = $pr.merged_at
@@ -428,4 +446,4 @@ function GetFormattedMarkdownForNoResult([string] $workflows, [string] $numberOf
     return $markdown
 }
 
-main -ownerRepo $ownerRepo -workflows $workflows -branch $branch -numberOfDays $numberOfDays -rejectLabels $rejectLabels -commitCountingMethod $commitCountingMethod  -patToken $patToken -actionsToken $actionsToken -appId $appId -appInstallationId $appInstallationId -appPrivateKey $appPrivateKey
+main -ownerRepo $ownerRepo -workflows $workflows -branch $branch -numberOfDays $numberOfDays -rejectLabels $rejectLabels -filterLabels $filterLabels -commitCountingMethod $commitCountingMethod  -patToken $patToken -actionsToken $actionsToken -appId $appId -appInstallationId $appInstallationId -appPrivateKey $appPrivateKey
