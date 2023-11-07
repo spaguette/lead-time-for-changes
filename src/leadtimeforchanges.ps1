@@ -69,8 +69,8 @@ function Main ([string] $ownerRepo,
 
     $prCounter = 0
     $totalPRHours = 0
-    # Filter the $prResponses array based on $rejectLabelsArray
-    $filteredPrResponses = $prResponses | Where-Object {
+    # Filter the $prsResponse array based on $rejectLabelsArray
+    $filteredPrResponses = $prsResponse | Where-Object {
         $prLabels = $_.labels.name
         foreach ($rejectLabel in $rejectLabelsArray) {
             if ($prLabels -contains $rejectLabel) {
