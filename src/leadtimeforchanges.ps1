@@ -19,7 +19,7 @@ function Main ([string] $ownerRepo,
     [string] $branch,
     [Int32] $numberOfDays,
     [string] $commitCountingMethod,
-    [string] $rejectLabels = "",
+    [string] $rejectLabels,
     [string] $patToken = "",
     [string] $actionsToken = "",
     [string] $appId = "",
@@ -42,6 +42,7 @@ function Main ([string] $ownerRepo,
     Write-Host "Owner/Repo: $owner/$repo"
     Write-Host "Number of days: $numberOfDays"
     Write-Host "Workflows: $($workflowsArray[0])"
+    Write-Host "Reject labels: $($rejectLabelsArray[0])"
     Write-Host "Branch: $branch"
     Write-Host "Commit counting method '$commitCountingMethod' being used"
 
@@ -74,6 +75,7 @@ function Main ([string] $ownerRepo,
     $filteredPrResponses = $prsResponse | Where-Object {
         Foreach ($label in $_.labels) {
             $labelName = $label.name
+            Write-Host "Checking label $labelName, against $($rejectLabelsArray[0]), result: $($rejectLabelsArray -contains $labelName)"
             if ($rejectLabelsArray -contains $labelName) {
                 $rejectedPrCounter++
                 return $false  # If any rejected label is found, exclude the item
