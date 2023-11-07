@@ -20,6 +20,9 @@ inputs:
     description: number of days to scan
     required: true
     default: 30
+  reject-labels: # optional
+    description: label names of PRs to reject
+    default: ""
   commit-counting-method: #optional, defaults to 'last'
     description: accepts two values, 'last' - to start timing from the last commit of a PR, and 'first' to start timing from the first commit of a PR
     required: true
@@ -45,5 +48,5 @@ runs:
     - name: Run DORA lead time for changes
       shell: pwsh
       run: |
-         $result = ${{ github.action_path }}/src/leadtimeforchanges.ps1 -ownerRepo "${{ inputs.owner-repo }}" -workflows "${{ inputs.workflows }}" -branch "${{ inputs.default-branch }}" -numberOfDays ${{ inputs.number-of-days }} -commitCountingMethod ${{ inputs.commit-counting-method }} -patToken "${{ inputs.pat-token }}" -actionsToken "${{ inputs.actions-token }}" -appId "${{ inputs.app-id }}" -appInstallationId "${{ inputs.app-install-id }}" -appPrivateKey "${{ inputs.app-private-key }}"             
+         $result = ${{ github.action_path }}/src/leadtimeforchanges.ps1 -ownerRepo "${{ inputs.owner-repo }}" -workflows "${{ inputs.workflows }}" -branch "${{ inputs.default-branch }}" -numberOfDays ${{ inputs.number-of-days }} -rejectLabels ${{inputs.reject-labels}} -commitCountingMethod ${{ inputs.commit-counting-method }} -patToken "${{ inputs.pat-token }}" -actionsToken "${{ inputs.actions-token }}" -appId "${{ inputs.app-id }}" -appInstallationId "${{ inputs.app-install-id }}" -appPrivateKey "${{ inputs.app-private-key }}"             
          Write-Output $result >> $env:GITHUB_STEP_SUMMARY
