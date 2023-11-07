@@ -5,6 +5,7 @@ Param(
     [string] $branch,
     [Int32] $numberOfDays,
     [string] $commitCountingMethod = "last",
+    [string] $rejectLabels = "",
     [string] $patToken = "",
     [string] $actionsToken = "",
     [string] $appId = "",
@@ -18,6 +19,7 @@ function Main ([string] $ownerRepo,
     [string] $branch,
     [Int32] $numberOfDays,
     [string] $commitCountingMethod,
+    [string] $rejectLabels = "",
     [string] $patToken = "",
     [string] $actionsToken = "",
     [string] $appId = "",
@@ -36,6 +38,7 @@ function Main ([string] $ownerRepo,
     {
         $commitCountingMethod = "last"
     }
+    $rejectLabelsArray = $rejectLabels -split ','
     Write-Host "Owner/Repo: $owner/$repo"
     Write-Host "Number of days: $numberOfDays"
     Write-Host "Workflows: $($workflowsArray[0])"
@@ -66,7 +69,17 @@ function Main ([string] $ownerRepo,
 
     $prCounter = 0
     $totalPRHours = 0
-    Foreach ($pr in $prsResponse){
+    # Filter the $prResponses array based on $rejectLabelsArray
+    $filteredPrResponses = $prResponses | Where-Object {
+        $prLabels = $_.labels.name
+        foreach ($rejectLabel in $rejectLabelsArray) {
+            if ($prLabels -contains $rejectLabel) {
+                return $false  # Exclude if any rejected label is found
+            }
+        }
+        return $true  # Include if none of the rejected labels are found
+    }
+    Foreach ($pr in $filteredPrResponses){
 
         $mergedAt = $pr.merged_at
         if ($mergedAt -ne $null -and $pr.merged_at -gt (Get-Date).AddDays(-$numberOfDays))

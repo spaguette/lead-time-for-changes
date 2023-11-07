@@ -21,7 +21,8 @@ A GitHub Action to roughly calculate DORA lead time for changes This is not mean
 - `owner-repo`: optional, string, defaults to the repo where the action runs. Can target another owner or org and repo. e.g. `'samsmithnz/DevOpsMetrics'`, but will require authenication (see below)
 - `default-branch`: optional, string, defaults to `main` 
 - `number-of-days`: optional, integer, defaults to `30` (days)
-- commit-counting-method: #optional, defaults to 'last'. Accepts two values, 'last' - to start timing from the last commit of a PR, and 'first' to start timing from the first commit of a PR
+- `reject-labels`: optional. Multiple label names to reject can be separated by `,`
+- `commit-counting-method`: #optional, defaults to 'last'. Accepts two values, 'last' - to start timing from the last commit of a PR, and 'first' to start timing from the first commit of a PR
 - `pat-token`: optional, string, defaults to ''. Can be set with GitHub PAT token. Ensure that `Read access to actions and metadata` permission is set. This is a secret, never directly add this into the actions workflow, use a secret.
 - `actions-token`: optional, string, defaults to ''. Can be set with `${{ secrets.GITHUB_TOKEN }}` in the action
 - `app-id`: optional, string, defaults to '', application id of the registered GitHub app
@@ -30,7 +31,7 @@ A GitHub Action to roughly calculate DORA lead time for changes This is not mean
 
 To test the current repo (same as where the action runs)
 ```
-- uses: samsmithnz/lead-time-for-changes@main
+- uses: spaguette/lead-time-for-changes@main
   with:
     workflows: 'CI'
 ```
@@ -38,7 +39,7 @@ To test the current repo (same as where the action runs)
 To test another repo, with all arguments
 ```
 - name: Test another repo
-  uses: samsmithnz/lead-time-for-changes@main
+  uses: spaguette/lead-time-for-changes@main
   with:
     workflows: 'CI/CD'
     owner-repo: 'samsmithnz/DevOpsMetrics'
@@ -49,7 +50,7 @@ To test another repo, with all arguments
 To use a PAT token to access another (potentially private) repo:
 ```
 - name: Test elite repo with PAT Token
-  uses: samsmithnz/lead-time-for-changes@main
+  uses: spaguette/lead-time-for-changes@main
   with:
     workflows: 'CI/CD'
     owner-repo: 'samsmithnz/SamsFeatureFlags'
@@ -59,7 +60,7 @@ To use a PAT token to access another (potentially private) repo:
 Use the built in Actions GitHub Token to retrieve the metrix 
 ```
 - name: Test this repo with GitHub Token
-  uses: samsmithnz/lead-time-for-changes@main
+  uses: spaguette/lead-time-for-changes@main
   with:
     workflows: 'CI'
     actions-token: "${{ secrets.GITHUB_TOKEN }}"
@@ -68,7 +69,7 @@ Use the built in Actions GitHub Token to retrieve the metrix
 Gather the metric from another repository using GitHub App authentication method:
 ```
 - name: Test another repo with GitHub App
-  uses: samsmithnz/lead-time-for-changes@main
+  uses: spaguette/lead-time-for-changes@main
   with:
     workflows: 'CI'
     owner-repo: 'samsmithnz/some-other-repo'
